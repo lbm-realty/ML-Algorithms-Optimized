@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include "data.h"
+#include "feature_scaling.h"
 
 /*
     Reference:
@@ -17,17 +20,21 @@
 double result[2];
 double *find_weights(const double *x, const double *y, int epochs, int m, int n, double alpha);
 void printArray(double *arr, int n);
+void printMatrix(double *arr, int rows, int cols);
 
 int main() {
-    const double X[][2] = {
-        {1, 2},
-        {2, 4},
-        {3, 6},
-        {4, 8}
-    };
-    const double Y[] = {7, 13, 19, 25};
-    double *result = find_weights(&X[0][0], Y, 100000, 4, 2, 0.01);
-    printArray(result, 2);
+
+    scaled_X(&X[0][0], 100, 8);
+    scaled_Y(Y, 100);
+    clock_t start = clock();
+    double *result = find_weights(&X[0][0], Y, 100000, 100, 8, 0.01);
+    clock_t end = clock();
+    double run_time = (double)(end - start);
+    
+    printArray(result, 8);
+    printArray(Y, 100);
+    printMatrix(&X[6][0], 1, 8);
+    printf("Run time: %.2lf\n", run_time / 1000);
 }
 
 double *find_weights(const double *x, const double *y, int epochs, int m, int n, double alpha) {
@@ -71,6 +78,15 @@ double *find_weights(const double *x, const double *y, int epochs, int m, int n,
 
 void printArray(double *arr, int n) {
     for (int i = 0; i < n + 1; i++)
-        printf("%.2lf ", arr[i]);
+        printf("%.2lf, ", arr[i]);
+    printf("\n");
+}
+
+void printMatrix(double *arr, int rows, int cols) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++)
+           printf("%.1lf, ", arr[i * cols + j]);
+        printf("\n");
+    }
     printf("\n");
 }

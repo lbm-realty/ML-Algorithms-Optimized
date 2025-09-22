@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 class Gradient_Descent:
     
@@ -23,22 +24,24 @@ class Gradient_Descent:
         return w, b
 
     def test(training_set, weights, bias):
-        prediction = [0 for i in range(len(training_set))]
+        # prediction = [0 for i in range(len(training_set))]
 
-        for i in range(len(training_set)):
-            prediction[i] = np.dot(weights, training_set[i]) + bias
+        # for i in range(len(training_set)):
+        prediction = np.dot(weights, training_set) + bias
         
         return prediction    
 
 
-x = np.array([
-    [1, 2],
-    [2, 4],
-    [3, 6], 
-    [4, 8]
-])
-y = np.array([7, 13, 19, 25])
-# weights = Gradient_Descent.grad_descent(x, y, 100000, 4, 2, 0.01)
+# x = np.array([
+#     [1, 2],
+#     [2, 4],
+#     [3, 6], 
+#     [4, 8]
+# ])
+# y = np.array([7, 13, 19, 25])
+# weights = Gradient_Descent.grad_descent(x, y, 1000, 4, 2, 0.01)
 # print(weights)
-results = Gradient_Descent.test(x, weights=[1.2, 2.4], bias=0.5)
+results = Gradient_Descent.test(training_set=[-0.5, 0.6, 1.1, 0.6, -1.0, 0.7, 1.7, 1.4], 
+                                weights=[0.02, 0.07, -0.12, -0.06, 0.06, -0.01, -0.04, 0.02], bias=0.55)
 print(results)
+
