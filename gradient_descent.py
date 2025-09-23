@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import time
 
 class Gradient_Descent:
     
@@ -19,29 +20,26 @@ class Gradient_Descent:
             b -= alpha * db
 
             if iter % 10000 == 0:
-                print(f"For {iter}th iteration\n\t the values of w and b are: {w[0], w[1], b[0]}")
+                print(f"For {iter}th iteration\n\t the values of w and b are: {w, b[0]}")
         
         return w, b
 
     def test(training_set, weights, bias):
-        # prediction = [0 for i in range(len(training_set))]
+        prediction = [0 for i in range(len(training_set))]
 
-        # for i in range(len(training_set)):
-        prediction = np.dot(weights, training_set) + bias
+        for i in range(len(training_set)):
+            prediction = np.dot(weights, training_set) + bias
         
         return prediction    
 
-
-# x = np.array([
-#     [1, 2],
-#     [2, 4],
-#     [3, 6], 
-#     [4, 8]
-# ])
-# y = np.array([7, 13, 19, 25])
-# weights = Gradient_Descent.grad_descent(x, y, 1000, 4, 2, 0.01)
+# start_time = time.time()
+# weights = Gradient_Descent.grad_descent(x, y, 100000, 100, 8, 0.01)
 # print(weights)
-results = Gradient_Descent.test(training_set=[-0.5, 0.6, 1.1, 0.6, -1.0, 0.7, 1.7, 1.4], 
-                                weights=[0.02, 0.07, -0.12, -0.06, 0.06, -0.01, -0.04, 0.02], bias=0.55)
-print(results)
+# end_time = time.time()
+# print(f"Run time for 100K iterations: {end_time - start_time}")
+results = Gradient_Descent.test(training_set=[-1.7, -1.4, -0.8, -1.6, -1.6, -1.3, -0.5, -1.4], 
+                                weights=[-0.08, -0.02, -0.03, 0.03, 0.05, -0.01, -0.01, -0.10], bias=0.64)
 
+for _ in range(100):
+    random_int = random.randint(0, 1)
+    print(f"{random_int},")

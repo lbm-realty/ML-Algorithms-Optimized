@@ -15,7 +15,7 @@
         - b -> bias
         - X -> training set
         - Y -> output set with answers
- */
+*/
 
 double result[2];
 double *find_weights(const double *x, const double *y, int epochs, int m, int n, double alpha);
@@ -24,17 +24,20 @@ void printMatrix(double *arr, int rows, int cols);
 
 int main() {
 
-    scaled_X(&X[0][0], 100, 8);
-    scaled_Y(Y, 100);
+    z_score_normalized_X(&X[0][0], 100, 8);
+    z_score_normalized_Y(Y, 100);
     clock_t start = clock();
     double *result = find_weights(&X[0][0], Y, 100000, 100, 8, 0.01);
     clock_t end = clock();
     double run_time = (double)(end - start);
     
+    printf("Weights: \n");
     printArray(result, 8);
-    printArray(Y, 100);
-    printMatrix(&X[6][0], 1, 8);
-    printf("Run time: %.2lf\n", run_time / 1000);
+    // printf("First 5 values of Y: \n");
+    // printArray(Y, 4);
+    // printf("First 5 rows of X: \n");
+    // printMatrix(&X[0][0], 4, 8);
+    printf("Run time for 10M iterations: %.2lf\n", run_time / 1000);
 }
 
 double *find_weights(const double *x, const double *y, int epochs, int m, int n, double alpha) {
@@ -53,10 +56,13 @@ double *find_weights(const double *x, const double *y, int epochs, int m, int n,
         // Going through all the training examples
         for (int i = 0; i < m; i++) {
             double f_prediction = 0.0;
+
             for (int j = 0; j < n; j++) 
                 f_prediction += (W[j] * x[i * n + j]);
+            double error = 0.0;
             f_prediction += b;
-            double error = f_prediction - y[i];
+            error = f_prediction - y[i];
+
             for (int j = 0; j < n; j++) 
                 dW[j] += error * x[i * n + j];
             db += error;
