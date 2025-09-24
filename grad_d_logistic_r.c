@@ -56,17 +56,15 @@ double *find_weights(const double *x, const double *y, int epochs, int m, int n,
 
         // Going through all the training examples
         for (int i = 0; i < m; i++) {
-            double f_prediction = 0.0;
-            double exp_function = 0.0;
+            double z = 0.0;
 
             for (int j = 0; j < n; j++) 
-                exp_function += (W[j] * x[i * n + j]);
+                z += (W[j] * x[i * n + j]);
 
-            exp_function += b;
-            exp_function = 1 / (1 + exp(-exp_function));
-            f_prediction = exp_function;
+            z += b;
+            z = 1 / (1 + exp(-z));
             double error = 0.0;
-            error = f_prediction - y[i];
+            error = z - y[i];
 
             for (int j = 0; j < n; j++) 
                 dW[j] += error * x[i * n + j];
