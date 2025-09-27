@@ -17,11 +17,14 @@ typedef struct NN_results
 
 void NN_ReLU_Sigmoid(double *X, double *Y, int epochs, int m, int n, int hidden_layers, int *neurons);
 NN_results forward_propagation(double *X, double *Y, int m, int n, int hidden_layers, int *neurons);
-void back_propagation(double **w1, double *w2, double *b1, double b2, double *predictions, int m, int n, int layers, double *y, int neurons);
+void back_propagation(double ***w, double *w_output, double **b, double b_output, double ***output_sets, double *predictions, double *x, double *y, int m, int n, int layers, int *neurons, double alpha);
+NN_results get_NN_results(double ***w, double *w_output, double **b, double b_output, double ***output_sets, double *predictions);
 
 int main () {
     int hidden_layers = 1; // Apart from the input and output layers
-    int neurons_per_layer = {8}; 
+    int *neurons_per_layer; 
+    int neurons[] = {8};
+    neurons_per_layer = neurons; 
     z_score_normalized_X(&X[0][0], 100, 8);
     NN_ReLU_Sigmoid(&X[0][0], Y_classification, 100, 100, 8, hidden_layers, neurons_per_layer);
     return 0;
@@ -32,7 +35,7 @@ void NN_ReLU_Sigmoid(double *X, double *Y, int epochs, int m, int n, int hidden_
     for (int iter = 0; iter < epochs; iter ++) {
         NN_results model_results;
         model_results = forward_propagation(X, Y_classification, m, n, hidden_layers, neurons);
-        // back_propagation(model_results.w1, model_results.w2, model_results.b1, model_results.b2, model_results.predictions, m, n, 1, Y_classification, n);
+        back_propagation(model_results.w, model_results.w_output, model_results.b, model_results.b_output, model_results.output_sets, model_results.predictions, X, Y_classification, m, n, hidden_layers, neurons, 0.01);
     }
 }
 
@@ -44,10 +47,10 @@ NN_results forward_propagation(double *X, double *Y, int m, int n, int layers, i
 
     // Each layer has its set of weights pointing to an array of pointers
     // and a set of biases that are the same number as the number of neurons for that layer
-    double ***weight_sets = (double ***)malloc(layers * sizeof(double));
-    double **biases = (double **)malloc(layers * sizeof(double));
+    double ***weight_sets = (double ***)malloc(layers * sizeof(double **));
+    double **biases = (double **)malloc(layers * sizeof(double *));
     for (int i = 0; i < layers; i++) {
-        weight_sets[i] = (double **)malloc(neurons[i] * sizeof(double));
+        weight_sets[i] = (double **)malloc(neurons[i] * sizeof(double *));
         biases[i] = (double *)calloc(neurons[i], sizeof(double));
         
         // Creating 2D array for neurons
@@ -65,9 +68,9 @@ NN_results forward_propagation(double *X, double *Y, int m, int n, int layers, i
     double *NN = (double *)calloc(m, sizeof(double));
 
     // For each training example, we will have a set of outputs
-    double ***output_sets = (double ***)malloc(m * sizeof(double));
+    double ***output_sets = (double ***)malloc(m * sizeof(double **));
     for (int i = 0; i < m; i++) {
-        output_sets[i] = (double **)calloc(layers, sizeof(double));
+        output_sets[i] = (double **)calloc(layers, sizeof(double *));
         for (int j = 0; j < layers; j++) 
             output_sets[i][j] = (double *)calloc(neurons[j], sizeof(double));
     }
@@ -124,23 +127,63 @@ NN_results forward_propagation(double *X, double *Y, int m, int n, int layers, i
     return final_results;
 }
 
-void back_propagation(double **w1, double *w2, double *b1, double b2, double *predictions, int m, int n, int layers, double *y, int neurons) {
-    // Output layer calc; keeping it seperate
-    double *dW1 = (double *)calloc(m, sizeof(double));
-    
-    for (int i = 0; i < m; i++) {
-        double output = predictions[i] - y[i];
-        output = output * predictions[i] * (1 - predictions[i]);
-        // dW1[i] = 
+#include <stdlib.h>
 
-        for (int l = layers; l > 0; l--) {
-            for (int j = 0; j < neurons; j++) {
-                ;
-            }
-        }
+void back_propagation(double ***w, double *w_output, double **b, double b_output, double ***output_sets, double *predictions, double *x, double *y, int m, int n, int layers, int *neurons, double alpha) {
+    // Allocate delta arrays for hidden layers + output layer
+    double **delta = malloc(layers * sizeof(double*));
+    for (int l = 0; l < layers; l++) {
+        delta[l] = calloc(neurons[l], sizeof(double));
     }
 
+    for (int i = 0; i < m; i++) {  // loop over examples
+
+        // Output layer delta
+        double pred = predictions[i];
+        double output_error = pred - y[i];        // derivative of Error
+        delta[layers-1][0] = output_error * pred * (1 - pred);  // sigmoid derivative
+
+        // Hidden layers delta
+        for (int l = layers-2; l >= 0; l--) {  // from last hidden down to first
+            for (int j = 0; j < neurons[l]; j++) {
+                double sum = 0.0;
+                int next_neurons = (l == layers-2) ? 1 : neurons[l+1]; // output layer has 1 neuron
+                for (int k = 0; k < next_neurons; k++) {
+                    if (l == layers-2)
+                        sum += delta[l+1][k] * w_output[k];   // weights from last hidden -> output
+                    else
+                        sum += delta[l+1][k] * w[l+1][k][j];  // hidden->hidden
+                }
+                // ReLU derivative
+                double derivative = (output_sets[i][l][j] > 0.0) ? 1.0 : 0.0;
+                delta[l][j] = sum * derivative;
+            }
+        }
+
+        // Update hidden->hidden weights and biases 
+        for (int l = 0; l < layers-1; l++) {  // all hidden layers
+            int prev_neurons = (l == 0) ? n : neurons[l-1];
+            for (int j = 0; j < neurons[l]; j++) {       // neuron in current layer
+                for (int k = 0; k < prev_neurons; k++) { // neuron/input in previous layer
+                    double a_prev = (l == 0) ? x[i*n + k] : output_sets[i][l-1][k];
+                    w[l][j][k] -= alpha * delta[l][j] * a_prev;
+                }
+                b[l][j] -= alpha * delta[l][j];
+            }
+        }
+
+        // ===== 4. Update last hidden -> output weights and bias =====
+        for (int j = 0; j < neurons[layers-1]; j++) {
+            w_output[j] -= alpha * delta[layers-1][0] * output_sets[i][layers-2][j];
+        }
+        b_output -= alpha * delta[layers-1][0];
+    }
+
+    // Free delta
+    for (int l = 0; l < layers; l++) free(delta[l]);
+    free(delta);
 }
+
 
 NN_results get_NN_results(double ***w, double *w_output, double **b, double b_output, double ***output_sets, double *predictions) {
     NN_results results;
@@ -155,3 +198,4 @@ NN_results get_NN_results(double ***w, double *w_output, double **b, double b_ou
     return results;
 
 }
+
