@@ -33,10 +33,6 @@ int main() {
     
     printf("Weights: \n");
     printArray(result, 8);
-    // printf("First 5 values of Y: \n");
-    // printArray(Y, 4);
-    // printf("First 5 rows of X: \n");
-    // printMatrix(&X[0][0], 4, 8);
     printf("Run time for 10M iterations: %.2lf\n", run_time / 1000);
 }
 

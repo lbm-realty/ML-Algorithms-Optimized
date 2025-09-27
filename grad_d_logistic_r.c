@@ -27,18 +27,15 @@ void prediction_vs_target(double *x, double *y, double *w, double b, int m, int 
 int main() {
 
     z_score_normalized_X(&X[0][0], 100, 8);
-    // scaled_Y(Y, 100);
-    // clock_t start = clock();
-    // double *result = find_weights(&X[0][0], Y_classification, 1000000, 100, 8, 0.01);
-    // clock_t end = clock();
-    // double run_time = (double)(end - start);
+    scaled_Y(Y, 100);
+    clock_t start = clock();
+    double *result = find_weights(&X[0][0], Y_classification, 1000000, 100, 8, 0.01);
+    clock_t end = clock();
+    double run_time = (double)(end - start);
 
-    // printf("Weights: \n");
-    // print_arrray(result, 8);
-    // printf("Run time for 10M iterations: %.2lf\n", run_time / 1000);
-    // prediction_vs_target(&X[0][0], Y_classification, result, result[8], 100, 8);
-    // print_matrix(&X[0][0], 100, 8);
-    print_arrray(Y, 100);
+    printf("Weights: \n");
+    print_arrray(result, 8);
+    printf("Run time for 10M iterations: %.2lf\n", run_time / 1000);
 }
 
 double *find_weights(const double *x, const double *y, int epochs, int m, int n, double alpha) {

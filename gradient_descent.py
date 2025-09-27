@@ -32,14 +32,8 @@ class Gradient_Descent:
         
         return prediction    
 
-# start_time = time.time()
-# weights = Gradient_Descent.grad_descent(x, y, 100000, 100, 8, 0.01)
-# print(weights)
-# end_time = time.time()
-# print(f"Run time for 100K iterations: {end_time - start_time}")
-results = Gradient_Descent.test(training_set=[-1.7, -1.4, -0.8, -1.6, -1.6, -1.3, -0.5, -1.4], 
-                                weights=[-0.08, -0.02, -0.03, 0.03, 0.05, -0.01, -0.01, -0.10], bias=0.64)
-
-for _ in range(100):
-    random_int = random.randint(0, 1)
-    print(f"{random_int},")
+start_time = time.time()
+weights = Gradient_Descent.grad_descent(x, y, 100000, 100, 8, 0.01)
+print(weights)
+end_time = time.time()
+print(f"Run time for 100K iterations: {end_time - start_time}")
