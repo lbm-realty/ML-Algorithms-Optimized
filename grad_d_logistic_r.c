@@ -27,7 +27,7 @@ void prediction_vs_target(double *x, double *y, double *w, double b, int m, int 
 int main() {
 
     z_score_normalized_X(&X[0][0], 100, 8);
-    scaled_Y(Y, 100);
+    z_score_normalized_Y(Y, 100);
     clock_t start = clock();
     double *result = find_weights(&X[0][0], Y_classification, 1000000, 100, 8, 0.01);
     clock_t end = clock();
