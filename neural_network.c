@@ -46,6 +46,7 @@ void NN_ReLU_Sigmoid(double *X, double *Y, int epochs, int m, int n, int hidden_
 
     prediction_vs_target(X, Y_classification, params.w, params.w_output, params.b, params.b_output, hidden_layers, neurons, 100, 8);
 
+    // Freeing all the allocated memory
     for (int i = 0; i < hidden_layers; i++) {
         for (int j = 0; j < neurons[i]; j++) {
             free(params.w[i][j]);
