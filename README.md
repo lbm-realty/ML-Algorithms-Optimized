@@ -1,1 +1,1 @@
-Needs an update!
+Building ML Algorithms in C to understand what really goes on under the hood! The power of C is insane, and so are the insanely difficult coding aspects of it. Stay tuned to see more implementations and test them out yourselves!
