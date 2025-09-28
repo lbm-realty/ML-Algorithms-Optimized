@@ -27,9 +27,8 @@ void prediction_vs_target(double *x, double *y, double *w, double b, int m, int 
 int main() {
 
     z_score_normalized_X(&X[0][0], 100, 8);
-    z_score_normalized_Y(Y, 100);
     clock_t start = clock();
-    double *result = find_weights(&X[0][0], Y_classification, 1000000, 100, 8, 0.01);
+    double *result = find_weights(&X[0][0], Y_classification, 10000000, 100, 8, 0.01);
     clock_t end = clock();
     double run_time = (double)(end - start);
 
@@ -75,6 +74,8 @@ double *find_weights(const double *x, const double *y, int epochs, int m, int n,
         for (int j = 0; j < n; j++) 
             W[j] -= alpha * dW[j];
         b -= alpha * db;
+
+        if (iter % 1000000 == 0) printf("Iteration: %d\n", iter);
     }
 
     W[n] = b;
@@ -83,7 +84,6 @@ double *find_weights(const double *x, const double *y, int epochs, int m, int n,
 }
 
 void prediction_vs_target(double *x, double *y, double *w, double b, int m, int n) {
-    int count = 0;
 
     for (int i = 0; i < m; i++) {
         double f_prediction = 0.0;
@@ -95,14 +95,8 @@ void prediction_vs_target(double *x, double *y, double *w, double b, int m, int 
         exp_function += b;
         exp_function = 1 / (1 + exp(-exp_function));
         
-        if (exp_function >= 0.5 && y[i] == 0)
-            count += 1;
-        if (exp_function < 0.5 && y[i] == 1)
-            count += 1;
-
-        // printf("%.1lf\t%.1lf\n", f_prediction, y[i]);
+        printf("%.1lf\t%.1lf\n", f_prediction, y[i]);
     }
-    printf("%d\n", count);
 
 }
 

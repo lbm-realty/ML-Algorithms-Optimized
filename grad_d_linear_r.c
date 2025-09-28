@@ -27,7 +27,7 @@ int main() {
     z_score_normalized_X(&X[0][0], 100, 8);
     z_score_normalized_Y(Y, 100);
     clock_t start = clock();
-    double *result = find_weights(&X[0][0], Y, 100000, 100, 8, 0.01);
+    double *result = find_weights(&X[0][0], Y, 10000000, 100, 8, 0.01);
     clock_t end = clock();
     double run_time = (double)(end - start);
     
@@ -71,6 +71,8 @@ double *find_weights(const double *x, const double *y, int epochs, int m, int n,
         for (int j = 0; j < n; j++) 
             W[j] -= alpha * dW[j];
         b -= alpha * db;
+
+        printf("Iteration: %d\n", iter);
     }
 
     W[n] = b;
